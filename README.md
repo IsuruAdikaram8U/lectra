@@ -35,6 +35,7 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **Master Data Management** - Manage lecturers (with specializations & availability), modules (with required credit hours), halls & labs (with capacity & specifications), batches (with student counts), and time slots.
 - **Clash Detection** - Automatically prevents conflicts: a lecturer can't teach two batches at once, a hall can't be double-booked, and a batch can't have overlapping classes. Also validates lecturer availability and hall capacity.
 - **Automatic Timetable Generation** - Given the semester inputs, the system generates a complete, clash-free draft timetable that admins can review and fine-tune.
+- **Notifications** - Automatic email alerts to affected students and lecturers when timetables or exam schedules are published or updated (sent in the background via Celery).
 - **Manual Editing** - Admins can adjust the generated timetable, with live clash detection guarding every change.
 - **Role-Based Access** - Separate experiences for Admins, HODs / Coordinators, Lecturers, and Students.
 - **Multi-Tenancy** - A single platform serves multiple faculties/campuses, with each tenant's data fully isolated and secure.
