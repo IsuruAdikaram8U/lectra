@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from accounts.models import Tenant
-from academics.models import Batch, Hall, Lecturer, Module, StudentGroup
+from academics.models import Batch, DegreeProgram, Hall, Lecturer, Module, StudentGroup
 
 
 class Timetable(models.Model):
@@ -22,6 +22,13 @@ class Timetable(models.Model):
     # without parsing free-text names.
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='timetables')
 
+    # A batch is enrolled in multiple degree programs at once (see
+    # BatchDegreeEnrollment), and each degree program publishes and manages
+    # its OWN independent timetable for that batch — e.g. B23's IT timetable
+    # and B23's AI timetable are two separate documents, not one shared one.
+    # Required (not nullable): every real timetable belongs to exactly one degree program.
+    degree_program = models.ForeignKey(DegreeProgram, on_delete=models.CASCADE, related_name='timetables')
+
     # Only ever set when a timetable is PUBLISHED — see save() below.
     # Drafts/suggestions leave this null, so several drafts can freely
     # coexist per batch without tripping the unique_together constraint.
@@ -38,10 +45,12 @@ class Timetable(models.Model):
     valid_to = models.DateField()
 
     class Meta:
-        # A published version number can't repeat for the same batch.
+        # Version numbering is scoped per (batch, degree_program) pair, not
+        # just per batch — so B23's IT timetable and B23's AI timetable can
+        # each independently reach "version 1" without colliding.
         # Has no effect on drafts, since version is null there and multiple
         # NULLs don't violate a unique constraint.
-        unique_together = ('batch', 'version')
+        unique_together = ('batch', 'degree_program', 'version')
 
     def save(self, *args, **kwargs):
         # Auto-assign the next version number the moment this row becomes
@@ -51,7 +60,9 @@ class Timetable(models.Model):
         if self.status == self.Status.PUBLISHED and self.version is None:
             latest = (
                 Timetable.objects
-                .filter(batch=self.batch, status=self.Status.PUBLISHED)
+                # Scoped by degree_program too, so each degree program's
+                # version sequence (V1, V2, V3...) is independent of the others.
+                .filter(batch=self.batch, degree_program=self.degree_program, status=self.Status.PUBLISHED)
                 .exclude(pk=self.pk)
                 .aggregate(models.Max('version'))
             )
@@ -83,6 +94,17 @@ class ScheduleEntry(models.Model):
         SATURDAY = 'SATURDAY', 'Saturday'
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='schedule_entries')
+
+    # NOTE on cross-degree shared sessions: a single physical class session
+    # can legitimately need to appear on more than one Timetable at once
+    # (e.g. a module jointly taught to IT and ITM students in the same hall,
+    # same time slot). Rather than making this field a ManyToMany, the
+    # convention is: create ONE ScheduleEntry row PER Timetable it belongs
+    # to, with identical module/lecturer/hall/day/time/student_groups data
+    # but a different `timetable` FK on each row. This keeps the common case
+    # (one entry, one timetable) simple and keeps clash-detection reasoning
+    # about a single timetable per row, at the cost of some duplicated rows
+    # for the relatively rare genuinely-shared sessions.
     timetable = models.ForeignKey(Timetable, on_delete=models.CASCADE, related_name='entries')
 
     # Nullable: a session doesn't have to be tied to a module (see event_name below).
