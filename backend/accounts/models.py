@@ -6,7 +6,12 @@ class Tenant(models.Model):
     # Represents one university/faculty using the platform.
     # Every other model (User, Lecturer, Hall, etc.) will eventually
     # carry a ForeignKey to this, to keep each tenant's data isolated.
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=150)  # e.g. "Faculty of Information Technology"
+
+    # Reserved for future subdomain-based tenant routing (e.g. "fit" -> fit.lectra.app).
+    # Nullable because we don't need subdomains yet, just the column ready for later.
+    domain_prefix = models.CharField(max_length=50, null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)  # set once, on insert
 
     def __str__(self):

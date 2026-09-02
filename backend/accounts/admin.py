@@ -6,7 +6,7 @@ from .models import Tenant, User
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
     # Columns shown in the Tenant list page
-    list_display = ['name', 'created_at']
+    list_display = ['name', 'domain_prefix', 'created_at']
     search_fields = ['name']
 
 
