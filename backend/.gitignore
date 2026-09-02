@@ -17,3 +17,7 @@ db.sqlite3-journal
 # IDE
 .vscode/
 .idea/
+
+# Seed script contains real lecturer names (from an internal faculty PDF)
+# and a shared placeholder password pattern — not for the public repo
+academics/management/commands/seed_it_timetable.py
