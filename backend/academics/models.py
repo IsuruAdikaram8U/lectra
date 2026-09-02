@@ -217,6 +217,11 @@ class StudentGroup(models.Model):
     # batch's worth of students in one degree program, or a mixed group
     # combining subsets from multiple batches/degree programs (e.g. a
     # shared practical session).
+    #
+    # Convention: create a NEW StudentGroup per distinct attendee
+    # composition, even if the label looks the same (e.g. "G1"). A Monday
+    # IT-only "G1" and a Tuesday combined IT+ITM "G1" are different sets of
+    # students and must be two separate StudentGroup rows, not one shared one.
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='student_groups')
     name = models.CharField(max_length=100)  # e.g. "IT-G1", "Mobile App Mixed-G1"
 
