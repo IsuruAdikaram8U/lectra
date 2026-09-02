@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'accounts',
 ]
 
+# Tell Django to use our custom User model instead of the built-in one.
+# Must be set before running migrate for the first time on this model —
+# changing it later requires a painful manual fix.
+AUTH_USER_MODEL = 'accounts.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
