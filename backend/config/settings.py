@@ -10,10 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv  # reads .env and puts its keys into os.environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load backend/.env into the process environment. Must run before any
+# os.environ.get() calls below, or they'll all come back None.
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,7 +44,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'accounts',
+    'academics',
+    'scheduling',
 ]
+
+# Tell Django to use our custom User model instead of the built-in one.
+# Must be set before running migrate for the first time on this model —
+# changing it later requires a painful manual fix.
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,11 +90,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'lectra_db'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
