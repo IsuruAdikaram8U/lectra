@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts',
+    'academics',
+    'scheduling',
 ]
 
 # Tell Django to use our custom User model instead of the built-in one.
