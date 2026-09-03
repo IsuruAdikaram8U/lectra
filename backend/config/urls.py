@@ -16,7 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from accounts.views import AdminOnlyPingView, CustomTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # JWT auth: POST username/password here to get access + refresh tokens
+    # (with role/username/email embedded in the access token — see
+    # accounts/views.py). POST the refresh token to the second URL to get
+    # a new access token once the old one expires.
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # Throwaway demo endpoint proving JWT auth + RBAC work — remove once
+    # Phase 3 has real Admin-only endpoints to exercise instead.
+    path('api/admin-ping/', AdminOnlyPingView.as_view(), name='admin_ping'),
 ]

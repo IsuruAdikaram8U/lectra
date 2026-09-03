@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv  # reads .env and puts its keys into os.environ
@@ -54,6 +55,24 @@ INSTALLED_APPS = [
 # Must be set before running migrate for the first time on this model —
 # changing it later requires a painful manual fix.
 AUTH_USER_MODEL = 'accounts.User'
+
+# Makes JWT the default way DRF identifies who's making a request — every
+# view checks for a valid "Authorization: Bearer <token>" header instead
+# of session cookies.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    # Short-lived: if a leaked access token gets stolen, the exposure window is small.
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    # Longer-lived: lets a user's frontend silently get a new access token
+    # without forcing them to log in again every 30 minutes.
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
