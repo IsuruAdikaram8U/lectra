@@ -1,6 +1,6 @@
 # Lectra - Smart Academic Timetable Management System
 
-> An intelligent, multi-tenant platform that automates academic timetable creation and scheduling for universities and faculties with AI-powered assistance, automatic clash-free timetable generation, and both web and mobile access.
+> An intelligent platform that automates academic timetable creation and scheduling for universities and faculties with AI-powered assistance, automatic clash-free timetable generation, and both web and mobile access.
 
 🚧 **Status:** Under active development (learning project - built module by module).
 
@@ -52,13 +52,9 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 ### Frontend (Web)
 - **Next.js** - React framework for the web application
 - **NextAuth** - Authentication & session management
-- **Tailwind CSS**, **Mantine UI**, **Radix UI** - Styling & accessible components
+- **Tailwind CSS**- Styling & accessible components
 - **Redux Toolkit** - State management
 - **Axios** - API integration
-- **Yup** - Form validation
-- **TanStack Table** - Advanced data tables
-- **Recharts** - Charts & analytics
-- **ESLint** - Code quality
 
 ### Mobile
 - **React Native (Expo)** - Cross-platform mobile app for students & lecturers
@@ -70,7 +66,7 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **RBAC** - Role-based access control & permissions
 - **Celery** - Background jobs (emails, scheduled tasks)
 - **Redis** - Caching & task queue
-- **OpenAPI / Swagger** - API documentation
+- **Swagger** - API documentation
 - **Google Gemini API** - AI assistant
 - **WeasyPrint** - PDF generation (timetables, exam schedules, reports)
 
@@ -81,9 +77,6 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 ### Testing, Quality & Deployment
 - **Pytest** - Automated testing
 - **Docker** - Containerization
-- **Gunicorn** & **Nginx** - Production serving
-- **Git / GitHub** - Version control
-- Structured logging & OWASP security practices
 
 ---
 
@@ -130,7 +123,7 @@ Lectra follows a clean, decoupled architecture. The web and mobile clients both 
 This project is built incrementally, phase by phase:
 
 - **Phase 1 - Foundation:** Project setup, database design, core models
-- **Phase 2 - Authentication & Security:** JWT auth, RBAC, multi-tenancy, tenant isolation
+- **Phase 2 - Authentication & Security:** JWT auth, RBAC, multi-tenancy
 - **Phase 3 - Core APIs:** Master data management (lecturers, modules, halls, batches)
 - **Phase 4 - Web Application:** Dashboards, tables, forms, role-based UI
 - **Phase 5 - Scheduling Engine:** Clash detection & automatic timetable generation
@@ -159,6 +152,6 @@ lectra/
 
 ## 📌 Note
 
-Lectra is a personal project built to design and implement a real-world academic scheduling system from the ground up covering full-stack development, secure multi-tenant architecture, background processing, algorithmic scheduling, and AI integration.
+Lectra is a personal project built to design and implement a real-world academic scheduling system from the ground up covering full-stack development.
 
 ---
