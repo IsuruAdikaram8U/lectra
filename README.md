@@ -35,10 +35,10 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **Master Data Management** - Manage lecturers (with specializations & availability), modules (with required credit hours), halls & labs (with capacity & specifications), batches (with student counts), and time slots.
 - **Clash Detection** - Automatically prevents conflicts: a lecturer can't teach two batches at once, a hall can't be double-booked, and a batch can't have overlapping classes. Also validates lecturer availability and hall capacity.
 - **Automatic Timetable Generation** - Given the semester inputs, the system generates a complete, clash-free draft timetable that admins can review and fine-tune.
-- **Notifications** - Automatic email alerts to affected students and lecturers when timetables or exam schedules are published or updated (sent in the background via Celery).
+- **Notifications** - Automatic email alerts to affected students and lecturers when timetables or exam schedules are published or updated
 - **Manual Editing** - Admins can adjust the generated timetable, with live clash detection guarding every change.
 - **Role-Based Access** - Separate experiences for Admins, HODs / Coordinators, Lecturers, and Students.
-- **Multi-Tenancy** - A single platform serves multiple faculties/campuses, with each tenant's data fully isolated and secure.
+- **Multi-Campus Support / Multi-Faculty Architecture** - A single platform serves multiple faculties/campuses, with each tenant's data fully isolated and secure.
 - **AI Assistant (Gemini-powered)** - Ask natural-language questions like *"Do I have a lecture today?"* or *"Is Hall B free tomorrow?"* and get instant answers.
 - **Dashboards & Analytics** - Visual insights into hall utilization, lecturer workload, and schedules.
 - **Exam Scheduling** - Generate clash-free exam timetables with proper hall allocation.
@@ -64,8 +64,6 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **Django REST Framework** - RESTful API design
 - **JWT** & **OAuth 2.0** - Authentication (email/password + Google sign-in)
 - **RBAC** - Role-based access control & permissions
-- **Celery** - Background jobs (emails, scheduled tasks)
-- **Redis** - Caching & task queue
 - **Swagger** - API documentation
 - **Google Gemini API** - AI assistant
 - **WeasyPrint** - PDF generation (timetables, exam schedules, reports)
