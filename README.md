@@ -65,6 +65,8 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **JWT** & **OAuth 2.0** - Authentication (email/password + Google sign-in)
 - **RBAC** - Role-based access control & permissions
 - **Swagger** - API documentation
+- **Celery** - Background jobs (emails, scheduled tasks)
+- **Redis** - Caching & task queue
 - **Google Gemini API** - AI assistant
 - **WeasyPrint** - PDF generation (timetables, exam schedules, reports)
 
