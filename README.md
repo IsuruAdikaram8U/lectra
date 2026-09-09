@@ -55,6 +55,7 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **Tailwind CSS**- Styling & accessible components
 - **Redux Toolkit** - State management
 - **Axios** - API integration
+- **ESLint** - Code quality
 
 ### Mobile
 - **React Native (Expo)** - Cross-platform mobile app for students & lecturers
