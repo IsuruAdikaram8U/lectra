@@ -158,8 +158,10 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# The "console" backend doesn't send real emails at all — instead, Django
+# prints the full email (subject, body, recipient) straight into the
+# terminal where `runserver` is running. That's exactly what we want for
+# local development: no real mail server needed, you just read the OTP
+# code off your own terminal output when testing registration.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
