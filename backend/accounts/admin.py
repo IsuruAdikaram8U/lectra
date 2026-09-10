@@ -26,5 +26,6 @@ class CustomUserAdmin(UserAdmin):
     # uom_email replaces email here — it's the field that actually
     # matters now (the real login identity), the inherited `email`
     # field is unused/legacy at this point.
-    list_display = ['username', 'uom_email', 'role', 'tenant', 'is_staff']
+    list_display = ['username', 'uom_email', 'google_email', 'role', 'tenant', 'is_staff']
+
 
