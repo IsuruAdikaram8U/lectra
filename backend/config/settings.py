@@ -65,6 +65,8 @@ AUTH_USER_MODEL = 'accounts.User'
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
+# Gemini API key for the AI assistant (see backend/.env for details).
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 # Makes JWT the default way DRF identifies who's making a request — every
 # view checks for a valid "Authorization: Bearer <token>" header instead
