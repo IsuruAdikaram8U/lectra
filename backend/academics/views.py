@@ -11,13 +11,6 @@ from django.conf import settings
 
 from .models import Lecturer
 
-
-# Created once when this module loads, not per-request — the client is
-# just a lightweight wrapper around your API key, no expensive connection
-# to keep open, so there's no benefit to recreating it on every request.
-genai_client = genai.Client(api_key=settings.GEMINI_API_KEY)
-
-
 class AssistantChatView(APIView):
     # Requires login (any role) — an AI endpoint with zero auth is an open
     # invitation for anyone on the internet to burn through your Gemini
@@ -67,6 +60,14 @@ class AssistantChatView(APIView):
             "If the answer isn't in the data provided, say you don't have that information."
         )
 
+        # Created here, not at module import time — creating it eagerly at
+        # import would mean Django can't even run `manage.py migrate` or
+        # `makemigrations` without a valid GEMINI_API_KEY present, since
+        # those commands import this file too. This broke CI: no .env file
+        # exists there, so the key is None and the client constructor
+        # throws immediately, crashing every management command, not just
+        # requests to this view.
+        genai_client = genai.Client(api_key=settings.GEMINI_API_KEY)
         response = genai_client.models.generate_content(
             model="gemini-3.6-flash",
             contents=prompt,
