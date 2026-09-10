@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'accounts',
     'academics',
@@ -55,6 +56,15 @@ INSTALLED_APPS = [
 # Must be set before running migrate for the first time on this model —
 # changing it later requires a painful manual fix.
 AUTH_USER_MODEL = 'accounts.User'
+
+# Google OAuth credentials, loaded from .env (never hardcoded — see the
+# earlier warning about not committing these to git). GOOGLE_CLIENT_ID is
+# the one that actually matters for verifying "Sign in with Google"
+# tokens; GOOGLE_CLIENT_SECRET isn't used by today's flow but is stored
+# for completeness / future server-side OAuth flows.
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+
 
 # Makes JWT the default way DRF identifies who's making a request — every
 # view checks for a valid "Authorization: Bearer <token>" header instead
@@ -75,6 +85,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,6 +94,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Explicitly whitelist which frontend origins are allowed to call this API.
+# Only your local Next.js dev server for now — add your real deployed
+# frontend URL here later, once you have one.
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 
 ROOT_URLCONF = 'config.urls'
 

@@ -8,7 +8,10 @@ from rest_framework import status
 from accounts.models import EmailOTP, User
 from accounts.permissions import IsAdmin
 from accounts.serializers import RegisterSerializer
-
+from django.conf import settings
+from django.contrib.auth import authenticate
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -107,3 +110,104 @@ class VerifyOTPView(APIView):
         })
 
 
+class GoogleAuthView(APIView):
+    # "Sign in with Google" — the frontend gets an id_token straight from
+    # Google's own Identity Services JS library and sends it here. We
+    # never trust that token blindly: verify_oauth2_token cryptographically
+    # checks Google's own signature on it, confirming it's real and
+    # actually intended for OUR app (via the audience/client_id check).
+    permission_classes = []
+
+    def post(self, request):
+        token = request.data.get('id_token')
+
+        try:
+            # audience=GOOGLE_CLIENT_ID: rejects a token that was issued
+            # for a DIFFERENT Google app pretending to be ours — without
+            # this check, any valid Google token from any app would pass.
+            idinfo = google_id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            # verify_oauth2_token raises ValueError for anything invalid —
+            # expired, tampered with, wrong audience, malformed, etc.
+            return Response(
+                {"error": "Invalid Google token."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # 'sub' is Google's own permanent, unique ID for this Google
+        # account — more reliable to match on than email (see the comment
+        # on User.google_id in models.py for why).
+        google_id = idinfo['sub']
+
+        try:
+            user = User.objects.get(google_id=google_id)
+        except User.DoesNotExist:
+            # This Google account has never been linked to a uom_email
+            # account. Per the plan: tell the frontend so it can show the
+            # "link your account" screen, rather than silently failing.
+            return Response(
+                {
+                    "error": "ACCOUNT_NOT_LINKED",
+                    "message": "No institution profile found for this Google account. Please verify with your university credentials to link.",
+                    "google_email": idinfo.get('email'),
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Known, already-linked Google account — log them straight in.
+        refresh = CustomTokenObtainPairSerializer.get_token(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        })
+
+
+class GoogleLinkView(APIView):
+    # Links a Google account to an EXISTING uom_email account. Requires
+    # proving ownership of BOTH: a fresh, valid Google id_token AND the
+    # uom_email account's real password — linking two identities together
+    # is exactly the kind of action that needs strong proof on both sides.
+    permission_classes = []
+
+    def post(self, request):
+        token = request.data.get('id_token')
+        uom_email = request.data.get('uom_email')
+        password = request.data.get('password')
+
+        try:
+            # Re-verify the Google token here too — never trust a
+            # google_id/email the client just tells you directly in the
+            # request body, always re-derive it from a freshly verified token.
+            idinfo = google_id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            return Response(
+                {"error": "Invalid Google token."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # authenticate() checks uom_email + password against the database,
+        # the same way logging in normally does. Passing it as `username`
+        # works even though our real field is uom_email — Django's
+        # ModelBackend specifically supports this for custom USERNAME_FIELD
+        # models, falling back to the literal `username` kwarg.
+        user = authenticate(request, username=uom_email, password=password)
+        if user is None:
+            return Response(
+                {"error": "Invalid university email or password."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Credentials proven — now actually link the two identities together.
+        user.google_id = idinfo['sub']
+        user.google_email = idinfo.get('email')
+        user.save()
+
+        refresh = CustomTokenObtainPairSerializer.get_token(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        })
