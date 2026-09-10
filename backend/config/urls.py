@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from accounts.views import AdminOnlyPingView, CustomTokenObtainPairView
+from accounts.views import AdminOnlyPingView, CustomTokenObtainPairView, RegisterView, VerifyOTPView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,4 +33,9 @@ urlpatterns = [
     # Throwaway demo endpoint proving JWT auth + RBAC work — remove once
     # Phase 3 has real Admin-only endpoints to exercise instead.
     path('api/admin-ping/', AdminOnlyPingView.as_view(), name='admin_ping'),
+
+    # University email registration + OTP verification flow
+    path('api/auth/register/', RegisterView.as_view(), name='register'),
+    path('api/auth/verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
+
 ]
