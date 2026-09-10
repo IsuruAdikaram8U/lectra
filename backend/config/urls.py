@@ -22,6 +22,8 @@ from accounts.views import (
     AdminOnlyPingView, CustomTokenObtainPairView, RegisterView, VerifyOTPView,
     GoogleAuthView, GoogleLinkView,
 )
+from academics.views import AssistantChatView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -45,4 +47,7 @@ urlpatterns = [
     # an existing uom_email account
     path('api/auth/google/', GoogleAuthView.as_view(), name='google_auth'),
     path('api/auth/google/link/', GoogleLinkView.as_view(), name='google_link'),
+
+    # AI assistant — answers questions using real Lectra data as context (RAG)
+    path('api/ai/chat/', AssistantChatView.as_view(), name='assistant_chat'),
 ]
