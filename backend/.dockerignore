@@ -1,0 +1,14 @@
+# Never copy your local venv into the image — the container has its own
+# Python environment, doesn't need or want your host machine's venv.
+venv/
+__pycache__/
+*.pyc
+
+# Contains real secrets (DB password, Google credentials) — these get
+# injected at container RUN time via docker-compose's env_file instead,
+# never baked into the image itself.
+.env
+
+db.sqlite3
+*.log
+.git

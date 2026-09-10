@@ -1,0 +1,82 @@
+# Orchestrates all three pieces of Lectra as one command: `docker-compose up`
+services:
+
+  db:
+    image: postgres:16
+    environment:
+      # These three create the database/user on first startup — must match
+      # what backend/.env and config/settings.py expect (DB_NAME, DB_USER).
+      POSTGRES_DB: lectra_db
+      POSTGRES_USER: postgres
+      # Reuses the same password already sitting in backend/.env, so you
+      # don't have two different passwords to keep track of.
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      # host_port:container_port — lets you still connect with psql/pgAdmin
+      # from your actual machine at localhost:5432, exactly like before.
+      - "5432:5432"
+    volumes:
+      # Persists the actual database files OUTSIDE the container's
+      # filesystem. Without this, every `docker-compose down` would wipe
+      # your entire database — this named volume survives container
+      # restarts/rebuilds.
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Lets `backend` (below) know when Postgres is actually ready to
+      # accept connections, not just "the container started" — those
+      # aren't the same moment, and Django would crash trying to connect
+      # too early otherwise.
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    # Injects every KEY=VALUE line from this file as environment variables
+    # inside the container — this is how the real secrets get in, without
+    # ever being baked into the image itself (see backend/.dockerignore).
+    env_file:
+      - ./backend/.env
+    environment:
+      # Overrides DB_HOST specifically for the containerized setup —
+      # "db" is the service name above, which Docker's internal DNS
+      # resolves automatically. Your LOCAL .env still says "localhost"
+      # for when you run Django natively outside Docker; this line
+      # overrides just that one value when running via compose.
+      DB_HOST: db
+    ports:
+      - "8000:8000"
+    volumes:
+      # Bind-mounts your actual backend/ folder INTO the container,
+      # overlaying what got COPY'd during the image build. This is what
+      # makes dev mode work: edit a .py file on your machine, the running
+      # container sees the change immediately (Django's autoreloader
+      # picks it up), no rebuild needed.
+      - ./backend:/app
+    depends_on:
+      db:
+        # Waits for the healthcheck above to report healthy, not just
+        # for the db container to exist — prevents a race condition where
+        # backend starts and immediately fails to connect.
+        condition: service_healthy
+
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/app
+      # Anonymous volume: this line specifically PREVENTS the bind mount
+      # above from overwriting the container's own /app/node_modules with
+      # your (possibly Windows-specific, possibly absent) host node_modules.
+      # Without this, `npm install` from the Dockerfile would get hidden
+      # by the bind mount and the container would have no dependencies at all.
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  # Declares the named volume used by `db` above — this is what actually
+  # persists across `docker-compose down` / `docker-compose up` cycles.
+  postgres_data:
