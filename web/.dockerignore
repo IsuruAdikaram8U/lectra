@@ -1,0 +1,13 @@
+# node_modules gets reinstalled fresh inside the container via `npm install`
+# in the Dockerfile above — copying your host machine's copy in would be
+# both wasteful and risky (native dependencies compiled for Windows won't
+# necessarily work inside a Linux container).
+node_modules/
+
+# Next.js's build output/cache — regenerated automatically, no reason to
+# ship stale cached output into a fresh image.
+.next/
+
+.env
+.env.local
+.git
