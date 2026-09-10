@@ -18,7 +18,10 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from accounts.views import AdminOnlyPingView, CustomTokenObtainPairView, RegisterView, VerifyOTPView
+from accounts.views import (
+    AdminOnlyPingView, CustomTokenObtainPairView, RegisterView, VerifyOTPView,
+    GoogleAuthView, GoogleLinkView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,4 +41,8 @@ urlpatterns = [
     path('api/auth/register/', RegisterView.as_view(), name='register'),
     path('api/auth/verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
 
+    # Google OAuth: "Sign in with Google" + linking a Google account to
+    # an existing uom_email account
+    path('api/auth/google/', GoogleAuthView.as_view(), name='google_auth'),
+    path('api/auth/google/link/', GoogleLinkView.as_view(), name='google_link'),
 ]
