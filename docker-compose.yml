@@ -2,7 +2,7 @@
 services:
 
   db:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     environment:
       # These three create the database/user on first startup — must match
       # what backend/.env and config/settings.py expect (DB_NAME, DB_USER).
@@ -12,9 +12,9 @@ services:
       # don't have two different passwords to keep track of.
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      # host_port:container_port — lets you still connect with psql/pgAdmin
-      # from your actual machine at localhost:5432, exactly like before.
-      - "5432:5432"
+      # host_port:container_port — exposed on 5434 so it never collides
+      # with native Windows PostgreSQL on 5432 or other projects on 5433.
+      - "5434:5432"
     volumes:
       # Persists the actual database files OUTSIDE the container's
       # filesystem. Without this, every `docker-compose down` would wipe
@@ -39,12 +39,11 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      # Overrides DB_HOST specifically for the containerized setup —
-      # "db" is the service name above, which Docker's internal DNS
-      # resolves automatically. Your LOCAL .env still says "localhost"
-      # for when you run Django natively outside Docker; this line
-      # overrides just that one value when running via compose.
+      # Overrides DB_HOST and DB_PORT specifically for the containerized setup —
+      # "db" is the service name above, and inside Docker's network Postgres
+      # always listens on 5432 (even though host maps 5434:5432).
       DB_HOST: db
+      DB_PORT: 5432
     ports:
       - "8000:8000"
     volumes:
