@@ -10,6 +10,7 @@ __pycache__/
 *.log
 db.sqlite3
 db.sqlite3-journal
+media/
 
 # Environment variables
 .env
@@ -18,6 +19,7 @@ db.sqlite3-journal
 .vscode/
 .idea/
 
-# Seed script contains real lecturer names (from an internal faculty PDF)
+# Seed scripts contain real lecturer names (from internal faculty PDFs)
 # and a shared placeholder password pattern — not for the public repo
 academics/management/commands/seed_it_timetable.py
+academics/management/commands/seed_sample_data.py
