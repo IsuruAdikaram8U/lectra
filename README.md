@@ -12,7 +12,7 @@
 
 In most faculties, timetabling is done by hand assigning modules to time slots, allocating lecturers, booking lecture halls and labs, and matching everything to student batches. This is time-consuming, and a single mistake (like double-booking a lecturer or a hall) can break the whole schedule.
 
-Lectra brings all of this into one system. Administrators manage lecturers, modules, halls, and batches in one place; the system automatically detects scheduling conflicts and can even **generate a complete, clash-free timetable** from a given set of inputs. Students and lecturers get instant access to their schedules through a web dashboard and a mobile app, plus an **AI assistant** that answers natural-language questions like *"Do I have a lecture today?"*
+Lectra brings all of this into one system. Administrators manage lecturers, modules, halls, and batches in one place; the system automatically detects scheduling conflicts and can even **generate a complete, clash-free timetable** from a given set of inputs. Students and lecturers get instant access to their schedules through a web dashboard and a mobile app, plus an **AI assistant** that answers natural-language questions like _"Do I have a lecture today?"_
 
 ---
 
@@ -24,7 +24,7 @@ Academic timetabling is a complex, high-effort task that faculties struggle with
 - **Clashes are easy to miss** - a lecturer assigned to two batches at once, a hall double-booked, a batch with two subjects at the same time.
 - **Constraints are hard to track** - lecturer specializations, availability, hall capacity, lab specifications, and batch sizes all have to line up.
 - **Credit hours must be respected** - each module needs a specific number of hours covered across the semester's weeks.
-- **No easy access** - students and lecturers often can't quickly check *"what's on today?"*
+- **No easy access** - students and lecturers often can't quickly check _"what's on today?"_
 
 Lectra solves these by centralizing the data, enforcing the rules automatically, and generating conflict-free schedules while giving everyone easy access on web and mobile.
 
@@ -39,7 +39,7 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **Manual Editing** - Admins can adjust the generated timetable, with live clash detection guarding every change.
 - **Role-Based Access** - Separate experiences for Admins, HODs / Coordinators, Lecturers, and Students.
 - **Multi-Campus Support / Multi-Faculty Architecture** - A single platform serves multiple faculties/campuses, with each tenant's data fully isolated and secure.
-- **AI Assistant (Gemini-powered)** - Ask natural-language questions like *"Do I have a lecture today?"* or *"Is Hall B free tomorrow?"* and get instant answers.
+- **AI Assistant (Gemini-powered)** - Ask natural-language questions like _"Do I have a lecture today?"_ or _"Is Hall B free tomorrow?"_ and get instant answers.
 - **Dashboards & Analytics** - Visual insights into hall utilization, lecturer workload, and schedules.
 - **Exam Scheduling** - Generate clash-free exam timetables with proper hall allocation.
 - **PDF Export** - Download timetables, exam schedules, and reports as PDF for printing or sharing.
@@ -50,6 +50,7 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 ## 🛠️ Tech Stack
 
 ### Frontend (Web)
+
 - **Next.js** - React framework for the web application
 - **NextAuth** - Authentication & session management
 - **Tailwind CSS**- Styling & accessible components
@@ -59,9 +60,11 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **ESLint** - Code quality
 
 ### Mobile
+
 - **React Native (Expo)** - Cross-platform mobile app for students & lecturers
 
 ### Backend
+
 - **Python** & **Django** - Core language & web framework
 - **Django REST Framework** - RESTful API design
 - **JWT** & **OAuth 2.0** - Authentication (email/password + Google sign-in)
@@ -73,10 +76,12 @@ Lectra solves these by centralizing the data, enforcing the rules automatically,
 - **WeasyPrint** - PDF generation (timetables, exam schedules, reports)
 
 ### Database
+
 - **PostgreSQL** - Primary relational database
 - **Django ORM** - Data modeling, migrations, query optimization
 
 ### Testing, Quality & Deployment
+
 - **Pytest** - Automated testing
 - **Docker** - Containerization
 
@@ -111,12 +116,12 @@ Lectra follows a clean, decoupled architecture. The web and mobile clients both 
 
 ## 👥 User Roles
 
-| Role | Capabilities |
-|------|-------------|
-| **Admin** | Full control - manage all master data, generate & edit timetables |
-| **HOD / Coordinator** | Manage their department's modules & lecturer allocations |
-| **Lecturer** | View their teaching schedule, update availability |
-| **Student** | View their batch timetable, use the AI assistant |
+| Role                  | Capabilities                                                      |
+| --------------------- | ----------------------------------------------------------------- |
+| **Admin**             | Full control - manage all master data, generate & edit timetables |
+| **HOD / Coordinator** | Manage their department's modules & lecturer allocations          |
+| **Lecturer**          | View their teaching schedule, update availability                 |
+| **Student**           | View their batch timetable, use the AI assistant                  |
 
 ---
 
