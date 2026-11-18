@@ -1,4 +1,5 @@
 from django.db import models
+from pgvector.django import HnswIndex, VectorField
 
 from accounts.models import Tenant, User
 
@@ -241,3 +242,69 @@ class GroupBatchMapping(models.Model):
 
     def __str__(self):
         return f"{self.student_group} <- {self.batch} ({self.student_count})"
+
+
+class StudentProfile(models.Model):
+    """Links a STUDENT User to their Batch and DegreeProgram for scoped timetables, notices, and AI responses."""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='students')
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='students')
+    degree_program = models.ForeignKey(DegreeProgram, on_delete=models.CASCADE, related_name='students')
+    index_number = models.CharField(max_length=20, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.batch.name} {self.degree_program.code})"
+
+
+class Notice(models.Model):
+    """Announcement or PDF resource published by Admin/HOD, indexed into DocumentChunks for RAG."""
+
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='notices')
+    title = models.CharField(max_length=200)
+    content = models.TextField(blank=True)
+    attachment = models.FileField(upload_to='notices/', null=True, blank=True)
+
+    # Empty list / empty M2M means "visible to everyone in this tenant".
+    target_roles = models.JSONField(default=list, blank=True)
+    target_batches = models.ManyToManyField(Batch, blank=True, related_name='notices')
+    target_degrees = models.ManyToManyField(DegreeProgram, blank=True, related_name='notices')
+
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_notices'
+    )
+    published_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-published_at']
+
+    def __str__(self):
+        return self.title
+
+
+class DocumentChunk(models.Model):
+    """Chunked text + 768-dim Gemini embedding for a Notice or its attached PDF."""
+
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name='chunks')
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='document_chunks')
+    chunk_index = models.IntegerField()
+    content = models.TextField()
+    embedding = VectorField(dimensions=768)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['notice', 'chunk_index']
+        indexes = [
+            HnswIndex(
+                name='doc_chunk_embedding_hnsw_idx',
+                fields=['embedding'],
+                m=16,
+                ef_construction=64,
+                opclasses=['vector_cosine_ops'],
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.notice.title} [chunk {self.chunk_index}]"

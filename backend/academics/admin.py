@@ -4,6 +4,7 @@ from .models import (
     Department, DegreeProgram, Batch, BatchDegreeEnrollment,
     Module, ModuleDegreeMapping, Lecturer, ModuleLecturer,
     LecturerAvailability, Hall, StudentGroup, GroupBatchMapping,
+    StudentProfile, Notice, DocumentChunk,
 )
 
 
@@ -85,3 +86,23 @@ class StudentGroupAdmin(admin.ModelAdmin):
 class GroupBatchMappingAdmin(admin.ModelAdmin):
     list_display = ['student_group', 'batch', 'student_count']
     list_filter = ['batch']
+
+
+@admin.register(StudentProfile)
+class StudentProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'batch', 'degree_program', 'index_number', 'tenant']
+    list_filter = ['tenant', 'batch', 'degree_program']
+    search_fields = ['user__username', 'user__uom_email', 'index_number']
+
+
+@admin.register(Notice)
+class NoticeAdmin(admin.ModelAdmin):
+    list_display = ['title', 'tenant', 'is_active', 'published_at', 'expires_at']
+    list_filter = ['tenant', 'is_active']
+    search_fields = ['title', 'content']
+
+
+@admin.register(DocumentChunk)
+class DocumentChunkAdmin(admin.ModelAdmin):
+    list_display = ['notice', 'chunk_index', 'tenant', 'created_at']
+    list_filter = ['tenant']
